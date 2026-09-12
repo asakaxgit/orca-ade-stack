@@ -28,5 +28,5 @@ curl -sS -X POST \
     '{label:$label,region:$region,type:$type,image:$image,root_pass:$root_pass,metadata:{user_data:($userdata|@base64)}}')" \
   https://api.linode.com/v4/linode/instances | jq '{id,label,status,ipv4,type}'
 
-echo "After boot: copy this directory to the VPS as /root/orca-ade-stack"
+echo "After boot: cloud-init clones https://github.com/asakaxgit/orca-ade-stack to /root/orca-ade-stack"
 echo "Then: TAILSCALE_AUTH_KEY=... /root/orca-ade-stack/scripts/01-tailscale-and-lockdown.sh"

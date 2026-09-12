@@ -33,12 +33,14 @@ Provide at create-time or after boot via secure channel — not chat:
 4. After boot: `gh` / Claude / Cursor / gcloud ADC / `GITHUB_TOKEN` in project `.local.envrc`
 
 ## Suggested create order
-1. Create VPS with `cloud-init.yaml` (inject SSH pubkeys + optional Tailscale key via `#cloud-config` vars — see comments in file).
-2. First boot installs packages + base SSH harden (password auth off) but **keeps public SSH until Tailscale is up**.
-3. SSH in → run `scripts/01-tailscale-and-lockdown.sh`.
-4. Run `scripts/02-orca-serve.sh` then `scripts/03-dev-toolchains.sh`.
+1. Create VPS with `cloud-init.yaml` (inject SSH pubkeys — see comments in file). Prefer plan **≥ 8 GiB**.
+2. First boot installs packages + base SSH harden (password auth off), keeps public SSH until Tailscale is up, and **`git clone`s this public repo to `/root/orca-ade-stack`** (scripts included automatically).
+3. SSH in → `TAILSCALE_AUTH_KEY=… /root/orca-ade-stack/scripts/01-tailscale-and-lockdown.sh`
+4. `/root/orca-ade-stack/scripts/02-orca-serve.sh` then `03-dev-toolchains.sh`
 5. Pair Orca client over Tailscale; do interactive logins in an Orca terminal.
-6. Hand day-to-day ops to an ops bot; keep this stack as the **build** recipe.
+6. Hand day-to-day ops to an ops bot; this repo stays the **build** recipe.
+
+Repo: https://github.com/asakaxgit/orca-ade-stack
 
 ## Linode notes
 - Plan: `g6-standard-4` (8 GiB) minimum for this workload.

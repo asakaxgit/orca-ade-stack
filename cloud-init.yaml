@@ -88,7 +88,7 @@ write_files:
   - path: /usr/local/share/orca-ade-stack/README.bootstrap
     permissions: "0644"
     content: |
-      Post-boot: copy orca-ade-stack scripts to /root/orca-ade-stack and run:
+      Post-boot: stack is at /root/orca-ade-stack (cloned from GitHub). Run:
         01-tailscale-and-lockdown.sh
         02-orca-serve.sh
         03-dev-toolchains.sh
@@ -139,14 +139,21 @@ runcmd:
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
     apt-get update -qq && apt-get install -y google-cloud-cli || true
-  - mkdir -p /opt/orca /home/orca/workspaces /home/orca/.local/bin /root/orca-ade-stack
+  - mkdir -p /opt/orca /home/orca/workspaces /home/orca/.local/bin
   - chown -R orca:orca /home/orca
   - |
     # CrowdSec (optional; safe to fail on older mirrors)
     apt-get install -y crowdsec crowdsec-firewall-bouncer || true
     systemctl enable --now crowdsec 2>/dev/null || true
     systemctl enable --now crowdsec-firewall-bouncer 2>/dev/null || true
+  - |
+    # Clone public stack (scripts/templates) — no secrets in repo
+    rm -rf /root/orca-ade-stack
+    git clone --depth 1 https://github.com/asakaxgit/orca-ade-stack.git /root/orca-ade-stack
+    chmod +x /root/orca-ade-stack/scripts/*.sh /root/orca-ade-stack/linode-create.example.sh || true
 
 final_message: |
-  orca-ade-stack cloud-init finished. Public SSH still open until you run
-  scripts/01-tailscale-and-lockdown.sh with a Tailscale auth key.
+  orca-ade-stack cloud-init finished. Stack cloned to /root/orca-ade-stack.
+  Public SSH still open until:
+    TAILSCALE_AUTH_KEY=... /root/orca-ade-stack/scripts/01-tailscale-and-lockdown.sh
+  Then run 02-orca-serve.sh and 03-dev-toolchains.sh.
