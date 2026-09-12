@@ -95,8 +95,7 @@ write_files:
       Do not put secrets in cloud-init.
 
   # Skeleton bashrc hooks for orca (toolchain install fills binaries later)
-  - path: /home/orca/.bashrc.orca-ade.snippet
-    owner: orca:orca
+  - path: /root/orca-ade.bashrc.snippet
     permissions: "0644"
     content: |
       # Managed by orca-ade-stack — prepended by 03-dev-toolchains.sh
@@ -141,6 +140,10 @@ runcmd:
     apt-get update -qq && apt-get install -y google-cloud-cli || true
   - mkdir -p /opt/orca /home/orca/workspaces /home/orca/.local/bin
   - chown -R orca:orca /home/orca
+  - |
+    if [ -f /root/orca-ade.bashrc.snippet ]; then
+      install -o orca -g orca -m 0644 /root/orca-ade.bashrc.snippet /home/orca/.bashrc.orca-ade.snippet
+    fi
   - |
     # CrowdSec (optional; safe to fail on older mirrors)
     apt-get install -y crowdsec crowdsec-firewall-bouncer || true
