@@ -1,0 +1,6 @@
+*.tar.gz
+.DS_Store
+bootstrap-secrets/
+*.key
+.env
+.local.envrc

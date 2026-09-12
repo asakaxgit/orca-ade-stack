@@ -1,0 +1,24 @@
+[Unit]
+Description=Orca runtime server
+After=network-online.target tailscaled.service
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=orca
+WorkingDirectory=/home/orca
+Environment=LIBGL_ALWAYS_SOFTWARE=1
+Environment=PATH=/home/orca/.local/bin:/home/orca/.nodenv/shims:/home/orca/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+# PAIRING_ADDRESS is replaced by scripts/02-orca-serve.sh (Tailscale IPv4)
+ExecStart=/opt/orca/orca-linux.AppImage serve --port 6768 --pairing-address PAIRING_ADDRESS --json
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+Restart=on-failure
+RestartPreventExitStatus=3
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
