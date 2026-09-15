@@ -1,6 +1,6 @@
 {
   "name": "orca-ade-stack",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "based_on": "Hardened headless Orca ADE on Ubuntu + Tailscale (2026 pattern)",
   "min_memory_mb": 8192,
   "recommended_linode_type": "g6-standard-4",
@@ -26,5 +26,9 @@
     "scripts/03-dev-toolchains.sh"
   ],
   "repo": "https://github.com/asakaxgit/orca-ade-stack",
-  "cloud_init_clones_repo": true
+  "cloud_init_clones_repo": true,
+  "docs": [
+    "README.md",
+    "docs/architecture.md"
+  ]
 }

@@ -2,6 +2,10 @@
 
 Reusable definition to create the **next** Ubuntu VPS for headless [Orca ADE](https://www.onorca.dev), matching the hardened `orca` Linode pattern — **without secrets**.
 
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md) for the generic Tailscale + VPS network diagram.
+
 ## Target shape
 - Ubuntu 24.04+ / 26.04 LTS, **≥ 8 GiB RAM** (4 GiB OOMs with agents + builds)
 - User `orca` (nologin OK; Orca terminals still source `~/.bashrc`)
