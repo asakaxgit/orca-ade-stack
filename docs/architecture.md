@@ -7,6 +7,7 @@ flowchart TB
   subgraph clients ["Clients"]
     opLaptop["Operator laptop"]
     orcaClient["Orca desktop client"]
+    mobileApp["Orca mobile app"]
     adminWs["Admin workstation"]
   end
 
@@ -27,6 +28,7 @@ flowchart TB
   opLaptop -->|"SSH keys"| tsNet
   adminWs -->|"SSH keys"| tsNet
   orcaClient <-->|"WebSocket pair"| tsNet
+  mobileApp <-->|"WebSocket / mobile pair"| tsNet
 
   tsNet --> tsIf
   tsIf --> sshd
@@ -34,6 +36,7 @@ flowchart TB
 
   opLaptop -.->|"blocked by UFW"| pubIf
   orcaClient -.->|"blocked by UFW"| pubIf
+  mobileApp -.->|"blocked by UFW"| pubIf
   console -.->|"out of band"| host
 ```
 
@@ -42,13 +45,14 @@ flowchart TB
 | Path | Allowed? |
 |------|----------|
 | Client → Tailscale IP `:22` (SSH keys) | Yes |
-| Orca client → Tailscale IP `:6768` (pairing / runtime) | Yes |
+| Orca desktop / mobile client → Tailscale IP `:6768` (pairing / runtime) | Yes |
 | Internet → public NIC `:22` / `:6768` | No (UFW deny on public interface) |
 | Provider console (LISH / serial / VNC equivalent) | Break-glass only |
 
 ## Notes
 
 - `orca serve --pairing-address` sets the **advertised** address only. Current AppImages typically still bind `0.0.0.0:6768`; **firewall** is the public exposure control until a bind-host flag exists.
+- Mobile: same Tailscale path; use `orca serve --mobile-pairing` (or the in-app mobile pair flow) when advertising a mobile-scoped link. The phone must be on the tailnet (or reach the advertised address).
 - Scale-out: clone this host pattern (same cloud-init + scripts); each host gets its own Tailscale IP and pairing address.
 - Secrets (Tailscale auth keys, tokens, ADC) stay out of this repo — see README.
 
