@@ -5,10 +5,8 @@ Generic layout produced by [orca-ade-stack](https://github.com/asakaxgit/orca-ad
 ```mermaid
 flowchart TB
   subgraph clients ["Clients"]
-    opLaptop["Operator laptop"]
-    orcaClient["Orca desktop client"]
+    yourComputer["Your computer<br/>SSH + Orca desktop client"]
     mobileApp["Orca mobile app"]
-    adminWs["Admin workstation"]
   end
 
   subgraph ts ["Tailscale tailnet"]
@@ -25,17 +23,15 @@ flowchart TB
     console["Provider emergency console<br/>break-glass"]
   end
 
-  opLaptop -->|"SSH keys"| tsNet
-  adminWs -->|"SSH keys"| tsNet
-  orcaClient <-->|"WebSocket pair"| tsNet
+  yourComputer -->|"SSH keys"| tsNet
+  yourComputer <-->|"WebSocket pair"| tsNet
   mobileApp <-->|"WebSocket / mobile pair"| tsNet
 
   tsNet --> tsIf
   tsIf --> sshd
   tsIf --> serve
 
-  opLaptop -.->|"blocked by UFW"| pubIf
-  orcaClient -.->|"blocked by UFW"| pubIf
+  yourComputer -.->|"blocked by UFW"| pubIf
   mobileApp -.->|"blocked by UFW"| pubIf
   console -.->|"out of band"| host
 ```
@@ -44,12 +40,14 @@ flowchart TB
 
 | Path | Allowed? |
 |------|----------|
-| Client → Tailscale IP `:22` (SSH keys) | Yes |
+| Your computer → Tailscale IP `:22` (SSH keys) | Yes |
 | Orca desktop / mobile client → Tailscale IP `:6768` (pairing / runtime) | Yes |
 | Internet → public NIC `:22` / `:6768` | No (UFW deny on public interface) |
 | Provider console (LISH / serial / VNC equivalent) | Break-glass only |
 
 ## Notes
+
+- **Your computer** is both SSH admin and the Orca desktop client in a typical solo setup; split them only if ops runs from a different machine.
 
 - `orca serve --pairing-address` sets the **advertised** address only. Current AppImages typically still bind `0.0.0.0:6768`; **firewall** is the public exposure control until a bind-host flag exists.
 - Mobile: same Tailscale path; use `orca serve --mobile-pairing` (or the in-app mobile pair flow) when advertising a mobile-scoped link. The phone must be on the tailnet (or reach the advertised address).
